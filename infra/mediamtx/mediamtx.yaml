@@ -1,0 +1,9 @@
+logLevel: info
+readTimeout: 10s
+api: yes
+apiAddress: 127.0.0.1:9997
+paths:
+  default:
+    source: srt://:6000?mode=listener
+    record: false
+
