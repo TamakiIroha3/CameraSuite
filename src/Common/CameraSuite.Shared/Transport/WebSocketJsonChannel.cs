@@ -36,7 +36,7 @@ public sealed class WebSocketJsonChannel : IAsyncDisposable
         await _sendLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var payload = JsonSerializer.SerializeToUtf8Bytes(message, message.GetType(), _jsonOptions);
+            var payload = JsonSerializer.SerializeToUtf8Bytes(message, typeof(ControlMessage), _jsonOptions);
             var segment = new ArraySegment<byte>(payload);
             await _socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken).ConfigureAwait(false);
         }
@@ -76,7 +76,7 @@ public sealed class WebSocketJsonChannel : IAsyncDisposable
             }
 
             var span = writer.WrittenSpan;
-            return (ControlMessage?)JsonSerializer.Deserialize(span, typeof(ControlMessage), _jsonOptions);
+            return JsonSerializer.Deserialize<ControlMessage>(span, _jsonOptions);
         }
         catch (OperationCanceledException)
         {
