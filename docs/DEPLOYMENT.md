@@ -1,19 +1,19 @@
-# CameraSuite Deployment Guide
+# CameraSuite ����ָ��
 
-This guide targets production or pre-production environments. ViewerHost requires Windows (WPF), while AuthService and SourceService can run on Windows or Linux.
+���Ľ��� CameraSuite ��������׼���������Ĳ��𷽷���ViewerHost ���� WPF���������� Windows��AuthService �� SourceService �ɲ����� Windows �� Linux ��������
 
-## 1. Prerequisites
+## 1. ����׼��
 
-| Component | Recommended version | Notes |
+| ��� | ����汾 | ˵�� |
 | --- | --- | --- |
-| Operating system | Windows 10/11, Windows Server 2019+, Ubuntu 22.04+ | ViewerHost must run on Windows; Auth/Source are cross-platform. |
-| .NET Runtime | .NET 8 Runtime / ASP.NET Core Runtime | Install `dotnet-hosting-8.0-win.exe` on Windows or `dotnet-hosting-8.0` on Linux. |
-| MediaMTX | Latest stable release | Download the official binary and place it in a fixed folder. |
-| FFmpeg | 4.4 or later | Required by SourceService; ensure `ffmpeg` is in PATH. |
-| LibVLC | LTS version matching LibVLCSharp | Bundle `libvlc.dll` and the `plugins` directory with ViewerHost. |
-| SRT tooling | Bundled with MediaMTX/FFmpeg | For TLS, prepare certificates via OpenSSL/certutil if necessary. |
+| ����ϵͳ | Windows 10/11��Windows Server 2019+��Ubuntu 22.04+ | ViewerHost ����ʹ�� Windows��Auth/Source �ɿ�ƽ̨���� |
+| .NET Runtime | .NET 8 Runtime / ASP.NET Core Runtime | Windows ��װ `dotnet-hosting-8.0-win.exe`��Linux ��װ `dotnet-hosting-8.0`�� |
+| MediaMTX | �����ȶ��� | ʹ�ùٷ������ư��������ڹ̶�Ŀ¼�� |
+| FFmpeg | 4.4 ������ | SourceService ��Ҫ `ffmpeg` ��ִ���ļ��� |
+| LibVLC | �� LibVLCSharp ���װ汾 | ViewerHost ����Ӧ�÷ַ� `libvlc.dll` �� `plugins` Ŀ¼�� |
+| SRT ���� | MediaMTX / FFmpeg ���� | ������ TLS���ɽ��� OpenSSL �� certutil ����֤�顣 |
 
-### Sample directory layout
+### Ŀ¼ʾ��
 
 ```
 C:\CameraSuite\
@@ -29,73 +29,73 @@ C:\CameraSuite\
   config\
 ```
 
-Keep `recordings` and `config` on storage that can be backed up and monitored.
+���齫 `recordings`��`config` ���ڿɱ����Ҿ߱��㹻 IOPS �Ĵ洢�ϡ�
 
-## 2. Build & Publish
+## 2. �����뷢��
 
 ```powershell
 dotnet publish src/Auth/CameraSuite.AuthService     -c Release -r win-x64 --self-contained false -o publish/auth
 dotnet publish src/Source/CameraSuite.SourceService -c Release -r win-x64 --self-contained false -o publish/source
-dotnet publish src/Viewer/CameraSuite.ViewerHost     -c Release -r win-x64 --self-contained false -o publish/viewer
+dotnet publish src/Viewer/CameraSuite.ViewerHost    -c Release -r win-x64 --self-contained false -o publish/viewer
 ```
 
-Copy the published folders to the target machine and include:
+���� `publish/*` ��Ŀ�����������ͬ����
 
-- `infra/mediamtx/mediamtx.exe` and its base configuration.
-- FFmpeg binaries.
-- LibVLC runtime files.
+- `infra/mediamtx/mediamtx.exe` �������ã�
+- FFmpeg ��ִ���ļ���
+- LibVLC ����ʱ�ļ���
 
-If you prefer self-contained deployments, add `--self-contained true` (and optionally `--p:PublishSingleFile=true`).
+������ȫ�԰������𣬿�׷�� `--self-contained true`����ѡ `--p:PublishSingleFile=true`����
 
-## 3. Configuration
+## 3. �����ļ�
 
-Edit the following configuration files in the deployment directory:
+����Ŀ¼�������
 
 - `auth/appsettings.json`
 - `source/appsettings.json`
 - `viewer/appsettings.json`
 
-### Auth (`CameraSuite:Auth`)
+### `CameraSuite:Auth`
 
-| Key | Description |
+| �� | ˵�� |
 | --- | --- |
-| `ControlPort` | WebSocket control plane port (default 5051). |
-| `SrtPortRangeStart/End` | Range of SRT listener ports; open them in the firewall. |
-| `UseTls` | Enable HTTPS/WSS if required. |
-| `AutoGenerateCertificate` | Create a self-signed certificate when none is supplied. |
-| `CertificatePath` / `CertificatePassword` | External PFX certificate. |
+| `ControlPort` | ����ƽ��˿ڣ�Ĭ�� 5051/TCP���� |
+| `SrtPortRangeStart/End` | SRT �����˿����䣨�迪�ŷ���ǽ���� |
+| `UseTls` | �Ƿ����� HTTPS/WSS�� |
+| `AutoGenerateCertificate` | ��֤��ʱ�Զ�������ǩ֤�顣 |
+| `CertificatePath` / `CertificatePassword` | �ⲿ PFX ֤��·������ |
 
-### Viewer (`CameraSuite:Viewer`)
+### `CameraSuite:Viewer`
 
-| Key | Description |
+| �� | ˵�� |
 | --- | --- |
-| `MediamtxExecutable` / `MediamtxConfigPath` | Paths to the MediaMTX binary and config. |
-| `PreallocatedSrtListeners` | Number of SRT listener ports to pre-start (must not exceed the auth SRT range). |
-| `ControlPlaneUri` | URI of the auth control plane (e.g. `ws://auth-host:5051/ws/viewer`). |
-| `TrustAllCertificates` | Set to true if using self-signed certificates. |
-| `Recording.RootDirectory` | Recording destination with write permissions. |
+| `MediamtxExecutable` / `MediamtxConfigPath` | MediaMTX ��ִ���ļ�������·���� |
+| `PreallocatedSrtListeners` | Ԥ����� SRT listener ���������� �� ��֤�� SRT �˿ڳ��������� |
+| `ControlPlaneUri` | ָ����֤�˿���ƽ�棬���� `ws://auth-host:5051/ws/viewer`�� |
+| `TrustAllCertificates` | ʹ����ǩ֤��ʱ��Ϊ true�� |
+| `Recording.RootDirectory` | ¼��Ŀ¼����߱�дȨ�ޡ� |
 
-### Source (`CameraSuite:Source`)
+### `CameraSuite:Source`
 
-| Key | Description |
+| �� | ˵�� |
 | --- | --- |
-| `LocalRtmpUrl` | Local RTMP ingest entry (default `rtmp://127.0.0.1/live`). |
-| `FfmpegExecutable` | Path to FFmpeg. |
-| `ControlPlanePath` | Path portion of the auth control plane (`/ws/source` by default). |
-| `UseTls` / `TrustAllCertificates` | Mirror the auth configuration. |
+| `LocalRtmpUrl` | ���� RTMP ������ڣ�Ĭ�� `rtmp://127.0.0.1/live`�� |
+| `FfmpegExecutable` | FFmpeg ·���� |
+| `ControlPlanePath` | ����ƽ��·����Ĭ�� `/ws/source`�� |
+| `UseTls` / `TrustAllCertificates` | ����֤�����ñ���һ�¡� |
 
-For production, place overrides in `appsettings.Production.json` and set `DOTNET_ENVIRONMENT=Production`.
+����������ʹ�� `appsettings.Production.json` ������ `DOTNET_ENVIRONMENT=Production`��
 
-## 4. Service Hosting
+## 4. ����ʾ��
 
-### 4.1 AuthService (Windows service)
+### 4.1 Windows ����AuthService��
 
 ```powershell
 sc create CameraSuiteAuth binPath= "C:\CameraSuite\auth\CameraSuite.AuthService.exe" start= auto
 sc start CameraSuiteAuth
 ```
 
-Or with NSSM:
+��ʹ�� NSSM��
 
 ```powershell
 nssm install CameraSuiteAuth C:\CameraSuite\auth\CameraSuite.AuthService.exe
@@ -103,9 +103,9 @@ nssm set CameraSuiteAuth AppDirectory C:\CameraSuite\auth
 nssm start CameraSuiteAuth
 ```
 
-### 4.2 SourceService (systemd example)
+### 4.2 Linux systemd��SourceService��
 
-`/etc/systemd/system/camerasuite-source.service`:
+`/etc/systemd/system/camerasuite-source.service`��
 
 ```ini
 [Unit]
@@ -127,9 +127,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now camerasuite-source
 ```
 
-### 4.3 ViewerHost (Windows)
+### 4.3 ViewerHost ������
 
-ViewerHost is a WPF desktop app. Use Task Scheduler to auto-start after login:
+ViewerHost Ϊ����Ӧ�ã���ͨ������ƻ��ڵ�¼���Զ�������
 
 ```powershell
 Register-ScheduledTask -TaskName "CameraSuiteViewer" `
@@ -138,30 +138,30 @@ Register-ScheduledTask -TaskName "CameraSuiteViewer" `
   -RunLevel Highest
 ```
 
-## 5. TLS
+## 5. TLS ����
 
-- With `UseTls=true`, AuthService loads the PFX indicated by `CertificatePath`. If none is provided and `AutoGenerateCertificate=true`, a self-signed certificate is created (suitable for lab environments).
-- SourceService and ViewerHost can accept self-signed certificates by setting `TrustAllCertificates=true`, or you can import the CA certificate into the OS trust store.
-- After renewing certificates, restart AuthService.
+- `UseTls=true` ʱ����֤�����ȼ��� `CertificatePath` ָ���� PFX����ȱʧ�� `AutoGenerateCertificate=true`�����Զ�������ǩ֤�飨�������ڱ��ܵ�������������
+- ViewerHost��SourceService ��ͨ�� `TrustAllCertificates=true` ������ǩ֤�飬�� CA ����ϵͳ֤����������
+- ����֤���������֤�˼�����Ч��
 
-## 6. Networking & Storage
+## 6. ������洢
 
-- Firewall: open the control plane port (default 5051/TCP) and the SRT range (default 6000–6999/UDP).
-- Monitor available storage under the recording root. Rotate or archive `.ts` files regularly, or mount NAS/SAN storage.
+- ����ǽ���п���ƽ��˿ڣ�Ĭ�� TCP 5051���� SRT �˿����䣨Ĭ�� UDP 6000-6999����
+- ����������鵵¼��Ŀ¼���ɲ��� NAS/SAN �ȹ����洢��
 
-## 7. Operations Notes
+## 7. ��ά����
 
-- Logs are written to stdout/stderr. Integrate with Serilog, Windows Event Log, or syslog as needed.
-- Track MediaMTX and FFmpeg CPU/memory usage; adjust `PreallocatedSrtListeners` based on expected peak load.
-- Preallocated listeners allow immediate stream authorisation without restarting MediaMTX. Ensure the auth service has a matching port range configured.
+- ��־Ĭ�����������̨������� Serilog��Windows Event Log �� syslog �ۺϡ�
+- ��� MediaMTX��FFmpeg �� CPU/�ڴ�ռ�ã�����ҵ���ֵ���� `PreallocatedSrtListeners` �� SRT �˿ڷ�Χ��
+- Ԥ���� Listener ����ͨ���������� MediaMTX�����豣֤��֤����ۿ�������һ�¡�
 
-## 8. Upgrade Procedure
+## 8. ��������
 
-1. Validate the new build in a test environment.
-2. Stop AuthService, SourceService, and ViewerHost.
-3. Back up the current binaries and configuration.
-4. Copy over the new publish output, keeping `appsettings*.json` and the recording directory.
-5. Restart services and verify WebSocket handshake, SRT push, playback, and recording.
-6. For TLS setups, confirm certificate validity and trust chain.
+1. �ڲ��Ի�����֤�°汾��
+2. ֹͣ AuthService��SourceService��ViewerHost��
+3. ���ݷ���Ŀ¼�������ļ���
+4. �����°汾������ `appsettings*.json` �� `recordings`����
+5. ����������֤ WebSocket ���֡�����/���š�¼���Ƿ�������
+6. ������ TLS��ȷ����֤����Ч����·���š�
 
-After these steps the new version should be live. For larger deployments consider a configuration service, reverse proxy, or containerisation (ViewerHost remains desktop-bound because of WPF).
+������ϲ��輴�������������Ҫ���ģ���𣬿ɿ��������������ġ����������������������ViewerHost ���� WPF �����Խ��鲿���� Windows ���滷������
