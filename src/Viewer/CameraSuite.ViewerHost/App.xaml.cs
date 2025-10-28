@@ -24,7 +24,7 @@ public partial class App : Application
         builder.Services.AddSingleton<ViewerState>();
         builder.Services.AddSingleton<PlaybackService>();
         builder.Services.AddSingleton<MediamtxManager>();
-        builder.Services.AddHostedService<ViewerWorker>();
+        builder.Services.AddHostedService<ViewerControlPlaneClient>();
         builder.Services.AddSingleton<MainWindowViewModel>();
         builder.Services.AddSingleton<MainWindow>();
 

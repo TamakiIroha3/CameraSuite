@@ -4,8 +4,6 @@ public sealed class CameraSuiteOptions
 {
     public const string SectionName = "CameraSuite";
 
-    public NatsOptions Nats { get; set; } = new();
-
     public RecordingOptions Recording { get; set; } = new();
 
     public AuthOptions Auth { get; set; } = new();
@@ -13,25 +11,6 @@ public sealed class CameraSuiteOptions
     public ViewerOptions Viewer { get; set; } = new();
 
     public SourceOptions Source { get; set; } = new();
-}
-
-public sealed class NatsOptions
-{
-    public string Url { get; set; } = "tls://127.0.0.1:4222";
-
-    public string ClientName { get; set; } = $"camera-suite-{Environment.MachineName}";
-
-    public string? ClientCertificatePath { get; set; }
-
-    public string? ClientKeyPath { get; set; }
-
-    public string? ClientKeyPassword { get; set; }
-
-    public string? CaCertificatePath { get; set; }
-
-    public bool TrustAllCertificates { get; set; } = true;
-
-    public int RequestTimeoutSeconds { get; set; } = 5;
 }
 
 public sealed class RecordingOptions
@@ -52,6 +31,20 @@ public sealed class AuthOptions
     public int PortHoldSeconds { get; set; } = 600;
 
     public int CleanupSweepSeconds { get; set; } = 60;
+
+    public int ControlPort { get; set; } = 5051;
+
+    public bool UseTls { get; set; } = false;
+
+    public bool AutoGenerateCertificate { get; set; } = true;
+
+    public string CertificateSubject { get; set; } = "CN=CameraSuiteAuth";
+
+    public int CertificateValidityDays { get; set; } = 30;
+
+    public string? CertificatePath { get; set; }
+
+    public string? CertificatePassword { get; set; }
 }
 
 public sealed class ViewerOptions
@@ -60,13 +53,21 @@ public sealed class ViewerOptions
 
     public string MediamtxConfigPath { get; set; } = "infra/mediamtx/mediamtx.yaml";
 
+    public int MediamtxApiPort { get; set; } = 9997;
+
     public string ViewerId { get; set; } = $"viewer-{Environment.MachineName}";
 
     public int MaxSimultaneousStreams { get; set; } = 16;
 
+    public int PreallocatedSrtListeners { get; set; } = 16;
+
     public int UiRefreshRateHz { get; set; } = 30;
 
     public string DisplayMode { get; set; } = "Grid";
+
+    public string ControlPlaneUri { get; set; } = "ws://127.0.0.1:5051/ws/viewer";
+
+    public bool TrustAllCertificates { get; set; } = true;
 }
 
 public sealed class SourceOptions
@@ -82,4 +83,10 @@ public sealed class SourceOptions
     public int RetryDelaySeconds { get; set; } = 5;
 
     public int MaxRetryCount { get; set; } = 10;
+
+    public string ControlPlanePath { get; set; } = "/ws/source";
+
+    public bool UseTls { get; set; } = false;
+
+    public bool TrustAllCertificates { get; set; } = true;
 }

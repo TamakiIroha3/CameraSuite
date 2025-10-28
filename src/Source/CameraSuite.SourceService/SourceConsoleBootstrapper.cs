@@ -18,7 +18,7 @@ public sealed class SourceConsoleBootstrapper : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        Task.Run(() => RunInteractiveAsync(), cancellationToken);
+        Task.Run(RunInteractiveAsync, cancellationToken);
         return Task.CompletedTask;
     }
 
@@ -31,11 +31,11 @@ public sealed class SourceConsoleBootstrapper : IHostedService
             Console.WriteLine("=============================================");
             Console.WriteLine(" CameraSuite Source Service                  ");
             Console.WriteLine("=============================================");
-            Console.WriteLine("请确保已在本地准备好 RTMP 输入源 (默认 rtmp://127.0.0.1/live/<channel>)。");
+            Console.WriteLine("请确保已在本地准备好 RTMP 输入，默认地址为 rtmp://127.0.0.1/live/<channel>。");
             Console.WriteLine();
 
             var authHost = Prompt("请输入认证端 IP/主机名");
-            var authPort = PromptInt("请输入认证端端口(默认 4222)", defaultValue: 4222);
+            var authPort = PromptInt("请输入认证端 WebSocket 端口 (默认 5051)", defaultValue: 5051);
             var authCode = Prompt("请输入认证码");
             var channelName = Prompt($"请输入通道名称 (默认 {_state.Options.DefaultChannelName})", allowEmpty: true);
 
@@ -44,7 +44,7 @@ public sealed class SourceConsoleBootstrapper : IHostedService
                 channelName = _state.Options.DefaultChannelName;
             }
 
-            var viewerAddress = Prompt("请输入观看端识别名 (可选)", allowEmpty: true);
+            var viewerAddress = Prompt("请输入观看端识别信息 (可选)", allowEmpty: true);
 
             var registration = new SourceRegistration(authHost, authPort, authCode, channelName, viewerAddress);
             if (!_state.TrySetRegistration(registration))

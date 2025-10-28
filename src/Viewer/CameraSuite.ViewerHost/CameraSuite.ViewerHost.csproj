@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp.WPF" Version="3.9.4" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
   </ItemGroup>
 
   <PropertyGroup>

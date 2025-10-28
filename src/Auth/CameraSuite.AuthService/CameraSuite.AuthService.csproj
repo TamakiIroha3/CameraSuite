@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\..\Common\CameraSuite.Shared\CameraSuite.Shared.csproj" />
   </ItemGroup>
 </Project>

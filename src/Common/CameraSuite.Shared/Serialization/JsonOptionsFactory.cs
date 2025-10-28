@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CameraSuite.Shared.Models;
 
 namespace CameraSuite.Shared.Serialization;
 
@@ -15,5 +16,6 @@ public static class JsonOptionsFactory
             {
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
             },
+            TypeInfoResolver = MessagingJsonContext.Default,
         };
 }

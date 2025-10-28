@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -34,12 +33,12 @@ public sealed class AuthConsoleBootstrapper : IHostedService
             Console.WriteLine("=============================================");
             Console.WriteLine(" CameraSuite Authentication Service (Auth)   ");
             Console.WriteLine("=============================================");
-            Console.WriteLine("请在使用前确认依赖版本：NATS、MediaMTX、LibVLCSharp。");
+            Console.WriteLine("请在使用前确认已阅读并获取最新版本：.NET 8、MediaMTX、LibVLCSharp、SRT、FFmpeg 官方文档。");
             Console.WriteLine($"本次运行的认证码: {authCode}");
             Console.WriteLine("请将该认证码提供给影像源端。");
             Console.WriteLine();
 
-            var viewerHost = Prompt("请输入观看端 (Viewer) 的主机地址或IP");
+            var viewerHost = Prompt("请输入观看端 (Viewer) 的主机地址或 IP");
             var apiPortInput = Prompt("请输入 mediamtx API 端口 (默认 9997，可直接回车)");
             var displayName = Prompt("请输入观看端展示名称 (可选)", optional: true);
 
@@ -57,7 +56,7 @@ public sealed class AuthConsoleBootstrapper : IHostedService
                 _logger.LogInformation("Viewer endpoint 已设置为 {Host}:{Port}", viewerHost, apiPort);
             }
 
-            Console.WriteLine($"等待影像源端通过 NATS 提交认证请求...");
+            Console.WriteLine("等待影像源端通过 WebSocket 提交认证请求...");
         }
         catch (Exception ex)
         {
